@@ -20,5 +20,12 @@
         "psr-4": {
             "Qwantum\\Image\\Tests\\": "tests"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Qwantum\\Image\\ImageServiceProvider"
+            ]
+        }
     }
 }
