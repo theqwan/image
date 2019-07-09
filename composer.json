@@ -1,0 +1,24 @@
+{
+    "name": "qwantum/image",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "TenTail",
+            "email": "tentail10@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "orchestra/testbench": "^3.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Qwantum\\Image\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Qwantum\\Image\\Tests\\": "tests"
+        }
+    }
+}
