@@ -19,6 +19,7 @@ class CreateImagesTable extends Migration
             $table->string('role')->nullable();
             $table->string('filename');
             $table->string('original_filename');
+            $table->string('mime_type');
             $table->string('extension');
             $table->string('path');
             $table->unsignedInteger('size');
