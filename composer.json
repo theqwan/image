@@ -25,7 +25,10 @@
         "laravel": {
             "providers": [
                 "Qwantum\\Image\\ImageServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Image": "Qwantum\\Image\\Facades\\Image"
+            }
         }
     }
 }

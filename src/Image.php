@@ -33,10 +33,27 @@ class Image extends Model
     ];
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'size' => 'int',
+    ];
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function imageable()
     {
         return $this->morphTo();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPathWithFilenameAttribute()
+    {
+        return "{$this->path}{$this->filename}.{$this->extension}";
     }
 }

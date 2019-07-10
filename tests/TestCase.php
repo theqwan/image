@@ -2,6 +2,7 @@
 
 namespace Qwantum\Image\Tests;
 
+use Illuminate\Support\Facades\Storage;
 use Qwantum\Image\ImageServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
@@ -14,6 +15,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        foreach (Storage::directories() as $directory) {
+            Storage::deleteDirectory($directory);
+        }
 
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
     }
@@ -29,6 +34,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [
             ImageServiceProvider::class,
+            TestServiceProvider::class,
         ];
     }
 
