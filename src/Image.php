@@ -31,4 +31,12 @@ class Image extends Model
         'location',
         'manual_order',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function imageable()
+    {
+        return $this->morphTo();
+    }
 }
