@@ -4,6 +4,7 @@ namespace Qwantum\Image\Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Qwantum\Image\Image;
@@ -74,5 +75,20 @@ class UploadTest extends TestCase
         $this->assertEquals($expected, $actual);
 
         Storage::assertExists($image->path_with_filename);
+    }
+
+    /** @test */
+    public function keep_original_image_test()
+    {
+        Config::set('image.keep_original', true);
+
+        $response = $this->json('POST', route('images.upload', 'test'), [
+            'upload' => $fake_image = UploadedFile::fake()->image('avatar.jpg'),
+            'role' => 'cover',
+        ])->assertStatus(200);
+
+        $image = Image::first();
+
+        Storage::assertExists($image->original_path_with_filename);
     }
 }

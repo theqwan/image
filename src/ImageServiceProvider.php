@@ -26,6 +26,7 @@ class ImageServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerMigrations();
+        $this->registerConfig();
     }
 
     protected function registerMigrations()
@@ -40,5 +41,14 @@ class ImageServiceProvider extends ServiceProvider
         $this->app->singleton('Image.router', function ($app) {
             return new Router(app(Registrar::class));
         });
+    }
+
+    protected function registerConfig(): void
+    {
+        $this->mergeConfigFrom(__DIR__ . '/../config/image.php', 'image');
+
+        $this->publishes([
+            __DIR__ . '/../config/image.php' => config_path('image.php'),
+        ], 'Image-config');
     }
 }

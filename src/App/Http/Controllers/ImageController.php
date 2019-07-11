@@ -42,8 +42,14 @@ class ImageController extends Controller
         $original_filename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
         $mime_type = $uploadedFile->getClientMimeType();
         $extension = $uploadedFile->getClientOriginalExtension();
-        $path = date('Y').'/'.date('m').'/'.$folder.'/';
+        $path = $this->moveTo($folder);
         $size = $uploadedFile->getSize();
+
+        if (config('image.keep_original')) {
+            Storage::putFileAs($this->moveTo("{$folder}/original"), $uploadedFile, "{$filename}.{$extension}");
+        }
+
+        Storage::putFileAs($path, $uploadedFile, "{$filename}.{$extension}");
 
         $image = Image::query()->create([
             'role' => $role,
@@ -57,8 +63,17 @@ class ImageController extends Controller
             'manual_order' => $manual_order,
         ]);
 
-        Storage::putFileAs($path, $uploadedFile, "{$filename}.{$extension}");
-
         return $image;
+    }
+
+    /**
+     * @param string $folder
+     * @return string
+     */
+    protected function moveTo($folder)
+    {
+        $base_path = date('Y').'/'.date('m');
+
+        return preg_replace("/[\/]{2}/", '/', "{$base_path}/{$folder}/");
     }
 }

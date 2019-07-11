@@ -54,6 +54,14 @@ class Image extends Model
      */
     public function getPathWithFilenameAttribute()
     {
-        return "{$this->path}{$this->filename}.{$this->extension}";
+        return preg_replace("/[\/]{2}/", '/', "{$this->path}/{$this->filename}.{$this->extension}");
+    }
+
+    /**
+     * @return string
+     */
+    public function getOriginalPathWithFilenameAttribute()
+    {
+        return preg_replace("/[\/]{2}/", '/', "{$this->path}/original/{$this->filename}.{$this->extension}");
     }
 }
