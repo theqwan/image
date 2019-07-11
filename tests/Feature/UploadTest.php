@@ -80,7 +80,7 @@ class UploadTest extends TestCase
     /** @test */
     public function keep_original_image_test()
     {
-        Config::set('image.keep_original', true);
+        Config::set('qwantum.image.keep_original', true);
 
         $response = $this->json('POST', route('images.upload', 'test'), [
             'upload' => $fake_image = UploadedFile::fake()->image('avatar.jpg'),
@@ -90,5 +90,39 @@ class UploadTest extends TestCase
         $image = Image::first();
 
         Storage::assertExists($image->original_path_with_filename);
+    }
+
+    /** @test */
+    public function thumbnails_test()
+    {
+        Config::set('qwantum.image.thumbnails', [
+            'small' => [50, 50],
+            'medium' => [null, 100],
+            'large' => [300, null],
+            'super_big' => [1280, null],
+        ]);
+
+        $response = $this->json('POST', route('images.upload', 'test'), [
+            'upload' => $fake_image = UploadedFile::fake()->image('avatar.jpg', 600, 500),
+            'role' => 'cover',
+        ])->assertStatus(200);
+
+        $image = Image::first();
+
+        Storage::assertExists($image->small);
+        list($width, $height, $type, $attr) = getimagesize(storage_path('app/'.$image->small));
+        $this->assertEquals([50, 42], [$width, $height]);
+
+        Storage::assertExists($image->medium);
+        list($width, $height, $type, $attr) = getimagesize(storage_path('app/'.$image->medium));
+        $this->assertEquals([120, 100], [$width, $height]);
+
+        Storage::assertExists($image->large);
+        list($width, $height, $type, $attr) = getimagesize(storage_path('app/'.$image->large));
+        $this->assertEquals([300, 250], [$width, $height]);
+
+        Storage::assertExists($image->super_big);
+        list($width, $height, $type, $attr) = getimagesize(storage_path('app/'.$image->super_big));
+        $this->assertEquals([600, 500], [$width, $height]);
     }
 }

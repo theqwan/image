@@ -64,4 +64,26 @@ class Image extends Model
     {
         return preg_replace("/[\/]{2}/", '/', "{$this->path}/original/{$this->filename}.{$this->extension}");
     }
+
+    /**
+     * This is not EloquentModel accessor function.
+     * Use `$model->{$thumbnail_name}` to get path.
+     *
+     * @param string $thumbnail_name
+     * @return string
+     */
+    protected function getThumbnailPathWithFilename($thumbnail_name)
+    {
+        return preg_replace("/[\/]{2}/", '/', "{$this->path}/{$this->filename}_{$thumbnail_name}.{$this->extension}");
+    }
+
+    public function __get($key)
+    {
+        // get thumbnails path
+        if (array_key_exists($key, config('qwantum.image.thumbnails'))) {
+            return $this->getThumbnailPathWithFilename($key);
+        }
+
+        return parent::__get($key);
+    }
 }

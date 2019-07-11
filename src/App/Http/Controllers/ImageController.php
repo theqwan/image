@@ -45,11 +45,24 @@ class ImageController extends Controller
         $path = $this->moveTo($folder);
         $size = $uploadedFile->getSize();
 
-        if (config('image.keep_original')) {
-            Storage::putFileAs($this->moveTo("{$folder}/original"), $uploadedFile, "{$filename}.{$extension}");
+        // keep original image
+        if (config('qwantum.image.keep_original')) {
+            Storage::put($this->moveTo("{$folder}/original", "{$filename}.{$extension}"), $uploadedFile);
         }
 
-        Storage::putFileAs($path, $uploadedFile, "{$filename}.{$extension}");
+        Storage::put($this->moveTo($folder, "{$filename}.{$extension}"), $uploadedFile);
+
+        // create thumbnail image
+        foreach (config('qwantum.image.thumbnails') as $thumbnail_name => $resize_setting) {
+            list($width, $height) = $resize_setting;
+
+            $thumbnail_image = \Intervention\Image\Facades\Image::make($uploadedFile->getRealPath())->resize($width, $height, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            })->stream();
+
+            Storage::put($this->moveTo($folder, "{$filename}_{$thumbnail_name}.{$extension}"), $thumbnail_image);
+        }
 
         $image = Image::query()->create([
             'role' => $role,
@@ -68,12 +81,13 @@ class ImageController extends Controller
 
     /**
      * @param string $folder
+     * @param string|null $filename
      * @return string
      */
-    protected function moveTo($folder)
+    protected function moveTo($folder, $filename = null)
     {
         $base_path = date('Y').'/'.date('m');
 
-        return preg_replace("/[\/]{2}/", '/', "{$base_path}/{$folder}/");
+        return preg_replace("/[\/]{2}/", '/', "{$base_path}/{$folder}/{$filename}");
     }
 }

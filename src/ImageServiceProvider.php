@@ -45,10 +45,10 @@ class ImageServiceProvider extends ServiceProvider
 
     protected function registerConfig(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/image.php', 'image');
+        $this->mergeConfigFrom(__DIR__ . '/../config/qwantum.image.php', 'qwantum.image');
 
         $this->publishes([
-            __DIR__ . '/../config/image.php' => config_path('image.php'),
+            __DIR__ . '/../config/qwantum.image.php' => config_path('qwantum.image.php'),
         ], 'Image-config');
     }
 }

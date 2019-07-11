@@ -7,7 +7,9 @@
             "email": "tentail10@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "intervention/image": "^2.5"
+    },
     "require-dev": {
         "orchestra/testbench": "^3.8"
     },
@@ -25,10 +27,7 @@
         "laravel": {
             "providers": [
                 "Qwantum\\Image\\ImageServiceProvider"
-            ],
-            "aliases": {
-                "Image": "Qwantum\\Image\\Facades\\Image"
-            }
+            ]
         }
     }
 }
