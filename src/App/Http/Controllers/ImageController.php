@@ -67,54 +67,27 @@ class ImageController extends Controller
         $size = $uploadedFile->getSize();
         list($width, $height, $type, $attr) = getimagesize($uploadedFile->getRealPath());
 
-        // compress
         Storage::putFileAs($this->moveTo($folder), $uploadedFile, "{$filename}.{$extension}");
+
         $uploadedFile_path = str_replace(' ', '\ ', Storage::path($this->moveTo($folder, "{$filename}.{$extension}")));
 
+        // resize
         if ($width > config('qwantum.image.max_width')) {
-            $resize_command = config('qwantum.image.imagemagick_path').str_replace([':path', ':max_width'], [$uploadedFile_path, config('qwantum.image.max_width')], config('qwantum.image.resize_max_width_command'));
-            exec($resize_command, $exce_output, $exec_result);
-            if ($exec_result) {
-                throw new ResizeException('resize error');
-            }
+            $this->resizeToMaxWidth($uploadedFile_path);
 
             $size = Storage::size($this->moveTo($folder, "{$filename}.{$extension}"));
         }
 
-        $compress_command = config('qwantum.image.imagemagick_path').str_replace(':path', $uploadedFile_path, config('qwantum.image.compress_command'));
-        exec($compress_command, $exce_output, $exec_result);
-        if ($exec_result) {
-            throw new CompressException('compress error');
-        }
+        // compress
+        $this->compress($uploadedFile_path);
 
         // create thumbnail image
-        foreach (config('qwantum.image.thumbnails') as $thumbnail_name => $resize_setting) {
-            list($width, $height) = $resize_setting;
-
-            $thumbnail_image = \Intervention\Image\Facades\Image::make(Storage::path($this->moveTo($folder, "{$filename}.{$extension}")))->resize($width, $height, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            })->stream();
-
-            Storage::put($this->moveTo($folder, "{$filename}_{$thumbnail_name}.{$extension}"), $thumbnail_image);
-        }
+        $this->generateThumbnails($folder, $filename, $extension);
 
         // keep original image
-        if (config('qwantum.image.keep_original')) {
-            Storage::putFileAs($this->moveTo("{$folder}/original"), $uploadedFile, "{$filename}.{$extension}");
-        }
+        $this->keepOriginal($uploadedFile, $folder, $filename, $extension);
 
-        $image = Image::query()->create([
-            'role' => $role,
-            'filename' => $filename,
-            'original_filename' => $original_filename,
-            'mime_type' => $mime_type,
-            'extension' => $extension,
-            'path' => $path,
-            'size' => $size,
-            'location' => $location,
-            'manual_order' => $manual_order,
-        ]);
+        $image = Image::query()->create(compact('role', 'filename', 'original_filename', 'mime_type', 'extension', 'path', 'size', 'location', 'manual_order'));
 
         return $image;
     }
@@ -129,5 +102,71 @@ class ImageController extends Controller
         $base_path = date('Y').'/'.date('m');
 
         return preg_replace("/[\/]{2}/", '/', "{$base_path}/{$folder}/{$filename}");
+    }
+
+    /**
+     * @param string $uploadedFile_path
+     * @return void
+     * @throws ResizeException
+     */
+    protected function resizeToMaxWidth($uploadedFile_path)
+    {
+        $resize_command = config('qwantum.image.imagemagick_path').str_replace([':path', ':max_width'], [$uploadedFile_path, config('qwantum.image.max_width')], config('qwantum.image.resize_max_width_command'));
+        exec($resize_command, $exce_output, $exec_result);
+
+        if ($exec_result) {
+            throw new ResizeException('resize error');
+        }
+    }
+
+    /**
+     * @param string $uploadedFile_path
+     * @return void
+     * @throws CompressException
+     */
+    protected function compress($uploadedFile_path)
+    {
+        $compress_command = config('qwantum.image.imagemagick_path') . str_replace(':path', $uploadedFile_path, config('qwantum.image.compress_command'));
+        exec($compress_command, $exce_output, $exec_result);
+
+        if ($exec_result) {
+            throw new CompressException('compress error');
+        }
+    }
+
+    /**
+     * @param $folder
+     * @param $filename
+     * @param string $extension
+     * @return void
+     */
+    protected function generateThumbnails($folder, $filename, string $extension)
+    {
+        foreach (config('qwantum.image.thumbnails') as $thumbnail_name => $resize_setting) {
+            list($width, $height) = $resize_setting;
+
+            $thumbnail_image = \Intervention\Image\Facades\Image::make(Storage::path($this->moveTo($folder, "{$filename}.{$extension}")))
+                ->resize($width, $height, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })
+                ->stream();
+
+            Storage::put($this->moveTo($folder, "{$filename}_{$thumbnail_name}.{$extension}"), $thumbnail_image);
+        }
+    }
+
+    /**
+     * @param UploadedFile $uploadedFile
+     * @param $folder
+     * @param $filename
+     * @param string $extension
+     * @return void
+     */
+    protected function keepOriginal(UploadedFile $uploadedFile, $folder, $filename, string $extension)
+    {
+        if (config('qwantum.image.keep_original')) {
+            Storage::putFileAs($this->moveTo("{$folder}/original"), $uploadedFile, "{$filename}.{$extension}");
+        }
     }
 }
