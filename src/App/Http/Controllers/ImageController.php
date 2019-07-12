@@ -4,7 +4,9 @@ namespace Qwantum\Image\App\Http\Controllers;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Qwantum\Image\App\Http\Requests\ImageRequest;
+use Qwantum\Image\Exceptions\TypeException;
 use Qwantum\Image\Image;
 use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 
@@ -31,9 +33,26 @@ class ImageController extends Controller
     /**
      * @param UploadedFile $uploadedFile
      * @param string $folder
-     * @param null $role
-     * @param null $location
-     * @param null $manual_order
+     * @param string|null $role
+     * @param string|null $location
+     * @param int|null $manual_order
+     * @return \Qwantum\Image\Image|\Illuminate\Database\Eloquent\Model
+     */
+    public function uploadFromFormPost(UploadedFile $uploadedFile, $folder, $role = null, $location = null, $manual_order = null)
+    {
+        if (Str::is('image/*', $uploadedFile->getClientMimeType())) {
+            return $this->saveImage($uploadedFile, $folder, $role, $location, $manual_order);
+        }
+
+        throw new TypeException('上傳檔案的類別不是圖片。');
+    }
+
+    /**
+     * @param UploadedFile $uploadedFile
+     * @param string $folder
+     * @param string|null $role
+     * @param string|null $location
+     * @param int|null $manual_order
      * @return \Qwantum\Image\Image|\Illuminate\Database\Eloquent\Model
      */
     protected function saveImage(UploadedFile $uploadedFile, $folder, $role = null, $location = null, $manual_order = null)
