@@ -54,5 +54,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'sqlite',
             'database' => ':memory:',
         ]);
+
+        $app['config']->set('qwantum.image.imagemagick_path', '/usr/local/opt/imagemagick@6/bin/');
     }
 }

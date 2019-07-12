@@ -102,27 +102,29 @@ class UploadTest extends TestCase
             'super_big' => [1280, null],
         ]);
 
+        Config::set('qwantum.image.max_width', 600);
+
         $response = $this->json('POST', route('images.upload', 'test'), [
-            'upload' => $fake_image = UploadedFile::fake()->image('avatar.jpg', 600, 500),
+            'upload' => $fake_image = UploadedFile::fake()->image('avatar.jpg', 1200, 1000),
             'role' => 'cover',
         ])->assertStatus(200);
 
         $image = Image::first();
 
         Storage::assertExists($image->small);
-        list($width, $height, $type, $attr) = getimagesize(storage_path('app/'.$image->small));
+        list($width, $height, $type, $attr) = getimagesize(Storage::path($image->small));
         $this->assertEquals([50, 42], [$width, $height]);
 
         Storage::assertExists($image->medium);
-        list($width, $height, $type, $attr) = getimagesize(storage_path('app/'.$image->medium));
+        list($width, $height, $type, $attr) = getimagesize(Storage::path($image->medium));
         $this->assertEquals([120, 100], [$width, $height]);
 
         Storage::assertExists($image->large);
-        list($width, $height, $type, $attr) = getimagesize(storage_path('app/'.$image->large));
+        list($width, $height, $type, $attr) = getimagesize(Storage::path($image->large));
         $this->assertEquals([300, 250], [$width, $height]);
 
         Storage::assertExists($image->super_big);
-        list($width, $height, $type, $attr) = getimagesize(storage_path('app/'.$image->super_big));
+        list($width, $height, $type, $attr) = getimagesize(Storage::path($image->super_big));
         $this->assertEquals([600, 500], [$width, $height]);
     }
 }
