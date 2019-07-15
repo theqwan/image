@@ -40,7 +40,7 @@ class ImageController extends Controller
      * @param int|null $manual_order
      * @return \Qwantum\Image\Image|\Illuminate\Database\Eloquent\Model
      */
-    public function uploadFromFormPost(UploadedFile $uploadedFile, $folder, $role = null, $location = null, $manual_order = null)
+    public function saveImageByUploadedFile(UploadedFile $uploadedFile, $folder, $role = null, $location = null, $manual_order = null)
     {
         if (Str::is('image/*', $uploadedFile->getClientMimeType())) {
             return $this->saveImage($uploadedFile, $folder, $role, $location, $manual_order);

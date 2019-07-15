@@ -62,7 +62,11 @@ class Image extends Model
      */
     public function getOriginalPathWithFilenameAttribute()
     {
-        return preg_replace("/[\/]{2}/", '/', "{$this->path}/original/{$this->filename}.{$this->extension}");
+        if (config('qwantum.image.keep_original')) {
+            return preg_replace("/[\/]{2}/", '/', "{$this->path}/original/{$this->filename}.{$this->extension}");
+        }
+
+        return $this->getPathWithFilenameAttribute();
     }
 
     /**

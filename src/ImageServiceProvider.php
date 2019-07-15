@@ -43,7 +43,7 @@ class ImageServiceProvider extends ServiceProvider
         });
     }
 
-    protected function registerConfig(): void
+    protected function registerConfig()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/qwantum.image.php', 'qwantum.image');
 
