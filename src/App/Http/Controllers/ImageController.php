@@ -4,7 +4,9 @@ namespace Qwantum\Image\App\Http\Controllers;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Qwantum\Image\App\Http\Requests\ImageRequest;
 use Qwantum\Image\Exceptions\CompressException;
 use Qwantum\Image\Exceptions\ResizeException;
@@ -22,6 +24,24 @@ class ImageController extends Controller
     public function upload(ImageRequest $request, $folder)
     {
         $file = $request->file('upload');
+
+        if ($request->input('width') != 0 && $request->input('height') != 0) {
+            $dimensions = Rule::dimensions();
+            $dimensions = $request->input('width') ? $dimensions->width($request->input('width')) : $dimensions;
+            $dimensions = $request->input('height') ? $dimensions->height($request->input('height')) : $dimensions;
+
+            $validator = Validator::make($request->all(), [
+                'upload' => [
+                    $dimensions,
+                ],
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Upload Failed. Image resolution must be '.$request->input('width', '?').'px x '.$request->input('height', '?').'px.',
+                ], 422);
+            }
+        }
 
         if ($file->isValid()) {
             $image = $this->saveImage($file, $folder, $request->input('role'), $request->input('location'), $request->input('manual_order'));
