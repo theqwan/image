@@ -37,6 +37,24 @@ class UploadTest extends TestCase
     }
 
     /** @test */
+    public function upload_height_width_validate_test()
+    {
+        $response = $this->json('POST', route('images.upload', 'test'), [
+            'upload' => UploadedFile::fake()->image('avatar.jpg', 200, 300),
+            'width' => 300,
+            'height' => 300,
+        ])->assertStatus(422);
+
+        $this->assertEquals('Upload Failed. Image resolution must be 300px x 300px.', $response->getData()->message);
+
+        $response = $this->json('POST', route('images.upload', 'test'), [
+            'upload' => UploadedFile::fake()->image('avatar.jpg', 300, 300),
+            'width' => 300,
+            'height' => 300,
+        ])->assertStatus(200);
+    }
+
+    /** @test */
     public function upload_image_will_create_image_model_test()
     {
         $response = $this->json('POST', route('images.upload', 'test'), [
