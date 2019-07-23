@@ -14,7 +14,7 @@ class Router
     /**
      * @var string
      */
-    protected $namespace = "Qwantum\\Image\\App\\Http\\Controllers";
+    protected $namespace = "\\Qwantum\\Image\\App\\Http\\Controllers";
 
     public function __construct(RegistrarContract $registrar)
     {
