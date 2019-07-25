@@ -7,6 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Qwantum\Image\Facades\ImageStorageUrl;
 use Qwantum\Image\Image;
 
 class UploadTest extends TestCase
@@ -69,12 +70,13 @@ class UploadTest extends TestCase
             'imageable_id' => null,
             'imageable_type' => null,
             'role' => 'cover',
-            'filename_length' => pathinfo($fake_image->hashName(), PATHINFO_FILENAME),
+            'filename' => $expected_filename = pathinfo($fake_image->hashName(), PATHINFO_FILENAME),
             'original_filename' => pathinfo($fake_image->getClientOriginalName(), PATHINFO_FILENAME),
             'mime_type' => $fake_image->getClientMimeType(),
-            'extension' => $fake_image->getClientOriginalExtension(),
-            'path' => date('Y').'/'.date('m').'/test/',
+            'extension' => $expected_extension = $fake_image->getClientOriginalExtension(),
+            'path' => $expected_path = date('Y').'/'.date('m').'/test/',
             'size' => $fake_image->getSize(),
+            'url' => ImageStorageUrl::to("{$expected_path}{$expected_filename}.{$expected_extension}"),
         ];
 
         $actual = [
@@ -82,12 +84,13 @@ class UploadTest extends TestCase
             'imageable_id' => $image->imageable_id,
             'imageable_type' => $image->imageable_type,
             'role' => $image->role,
-            'filename_length' => $image->filename,
+            'filename' => $image->filename,
             'original_filename' => $image->original_filename,
             'mime_type' => $image->mime_type,
             'extension' => $image->extension,
             'path' => $image->path,
             'size' => $image->size,
+            'url' => $image->url,
         ];
 
         $this->assertEquals($expected, $actual);

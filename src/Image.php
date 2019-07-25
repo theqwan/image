@@ -3,6 +3,7 @@
 namespace Qwantum\Image;
 
 use Illuminate\Database\Eloquent\Model;
+use Qwantum\Image\Facades\ImageStorageUrl;
 
 class Image extends Model
 {
@@ -42,11 +43,28 @@ class Image extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'url',
+    ];
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function imageable()
     {
         return $this->morphTo();
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlAttribute()
+    {
+        return ImageStorageUrl::to($this->getPathWithFilenameAttribute());
     }
 
     /**

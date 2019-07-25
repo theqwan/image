@@ -3,6 +3,7 @@
 namespace Qwantum\Image;
 
 use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
 use Qwantum\Image\Routing\Router;
 
@@ -16,6 +17,13 @@ class ImageServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerRouter();
+
+        $this->app->singleton('ImageStorage.url', function () {
+            return new UrlGenerator(
+                $routes = new \Illuminate\Routing\RouteCollection,
+                $request = \Illuminate\Http\Request::create('http://'.config('qwantum.image.storage_domain'))
+            );
+        });
     }
 
     /**
