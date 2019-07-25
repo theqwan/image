@@ -53,3 +53,20 @@ $.post('{{ route('image.upload', $folder) }}', {
 - 原始上傳圖片路徑： `$file->original_path_with_filename`
 - 預設大小圖片路徑： `$file->path_with_filename`
 - thumbnail圖片路徑： `$file->{$thumbnail_name}`
+
+## 獲取圖片網址
+
+網址的 Domain 可在 `config/qwantum.image.php` 中的 `storage_domain` 設定。
+
+獲取原始大小圖的網址
+```php
+$image->url;
+```
+
+獲取 thumbnails 的網址
+```php
+Qwantum\Image\Facades\ImageStorageUrl::to($image->{$thumbnail_name});
+```
+
+> 若要強制使用 https 可在 AppServiceProvider 的 boot() 新增
+> `Qwantum\Image\Facades\ImageStorageUrl::forceScheme('https')`

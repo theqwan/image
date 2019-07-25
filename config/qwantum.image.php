@@ -9,6 +9,11 @@ return [
     'keep_original' => false,
 
     /*
+    | Image storage domain.
+    */
+    'storage_domain' => 'localhost',
+
+    /*
     | ImageMagick command PATH.
     */
     'imagemagick_path' => env('IMAGEMAGICK_PATH', '/usr/local/bin/'),
