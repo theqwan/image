@@ -2,12 +2,10 @@
 
 namespace Qwantum\Image\Routing;
 
-use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
-
 class Router
 {
     /**
-     * @var RegistrarContract
+     * @var \Illuminate\Routing\RouteRegistrar
      */
     private $registrar;
 
@@ -16,9 +14,9 @@ class Router
      */
     protected $namespace = "\\Qwantum\\Image\\App\\Http\\Controllers";
 
-    public function __construct(RegistrarContract $registrar)
+    public function __construct()
     {
-        $this->registrar = $registrar;
+        $this->registrar = app('router');
     }
 
     public function route()
