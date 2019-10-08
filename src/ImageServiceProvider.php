@@ -47,7 +47,7 @@ class ImageServiceProvider extends ServiceProvider
     protected function registerRouter()
     {
         $this->app->singleton('Image.router', function ($app) {
-            return new Router(app(Registrar::class));
+            return new Router;
         });
     }
 
