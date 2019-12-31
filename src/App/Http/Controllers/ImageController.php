@@ -62,7 +62,7 @@ class ImageController extends Controller
      */
     public function saveImageByUploadedFile(UploadedFile $uploadedFile, $folder, $role = null, $location = null, $manual_order = null)
     {
-        if (Str::is('image/*', $uploadedFile->getClientMimeType())) {
+        if (Str::is('image/*', $uploadedFile->getMimeType())) {
             return $this->saveImage($uploadedFile, $folder, $role, $location, $manual_order);
         }
 
@@ -81,7 +81,7 @@ class ImageController extends Controller
     {
         $filename = pathinfo($uploadedFile->hashName(), PATHINFO_FILENAME);
         $original_filename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-        $mime_type = $uploadedFile->getClientMimeType();
+        $mime_type = $uploadedFile->getMimeType();
         $extension = $uploadedFile->getClientOriginalExtension();
         $path = $this->moveTo($folder);
         $size = $uploadedFile->getSize();
