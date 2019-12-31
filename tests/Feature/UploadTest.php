@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Qwantum\Image\Facades\ImageStorageUrl;
+use Qwantum\Image\Facades\Image as ImageFacade;
 use Qwantum\Image\Image;
 
 class UploadTest extends TestCase
@@ -25,6 +26,16 @@ class UploadTest extends TestCase
         $extension = $fake_image->getClientOriginalExtension();
 
         Storage::assertExists(date('Y').'/'.date('m').'/test/'.$filename.'.'.$extension);
+    }
+
+    /** @test */
+    public function save_uploaded_image()
+    {
+        $fake_image = UploadedFile::fake()->image('avatar.jpg');
+
+        $image = ImageFacade::saveImageByUploadedFile($fake_image, 'test');
+
+        $this->assertInstanceOf(Image::class, $image);
     }
 
     /** @test */
