@@ -68,6 +68,21 @@ class Image extends Model
     }
 
     /**
+     * Get thumbnail url.
+     *
+     * @param string $thumbnail_name
+     * @return string|null
+     */
+    public function getThumbnailUrl($thumbnail_name)
+    {
+        if (array_key_exists($thumbnail_name, config('qwantum.image.thumbnails'))) {
+            return ImageStorageUrl::to('uploads/' . $this->getThumbnailPathWithFilename($thumbnail_name));
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * @return string
      */
     public function getPathWithFilenameAttribute()
@@ -99,11 +114,15 @@ class Image extends Model
         return preg_replace("/[\/]{2}/", '/', "{$this->path}/{$this->filename}_{$thumbnail_name}.{$this->extension}");
     }
 
+    /** @inheritDoc */
     public function __get($key)
     {
-        // get thumbnails path
-        if (array_key_exists($key, config('qwantum.image.thumbnails'))) {
-            return $this->getThumbnailPathWithFilename($key);
+        foreach (array_keys(config('qwantum.image.thumbnails')) as $thumbnail_name) {
+            if ($key === $thumbnail_name) {
+                return $this->getThumbnailPathWithFilename($key);
+            } elseif ($key === $thumbnail_name . '_url') {
+                return $this->getThumbnailUrl($thumbnail_name);
+            }
         }
 
         return parent::__get($key);

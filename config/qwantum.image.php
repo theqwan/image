@@ -11,7 +11,7 @@ return [
     /*
     | Image storage domain.
     */
-    'storage_domain' => 'localhost',
+    'storage_domain' => env('DOMAIN_FILESTORAGE', 'localhost'),
 
     /*
     | ImageMagick command PATH.

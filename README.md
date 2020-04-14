@@ -73,6 +73,8 @@ $image->url;
 
 獲取 thumbnails 的網址
 ```php
+$image->{$thumbnail_name}_url;
+or
 Qwantum\Image\Facades\ImageStorageUrl::to($image->{$thumbnail_name});
 ```
 
