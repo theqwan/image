@@ -80,3 +80,34 @@ Qwantum\Image\Facades\ImageStorageUrl::to($image->{$thumbnail_name});
 
 > 若要強制使用 https 可在 AppServiceProvider 的 boot() 新增
 > `Qwantum\Image\Facades\ImageStorageUrl::forceScheme('https')`
+
+## 各別控制
+
+若有某個 Model 不想產生縮圖 或 縮圖需要特別設定大小 或 不要調整最大寬度，可以跟隨以下步驟來設定：
+
+1. 設定資料夾與 Model 的對應表。
+
+```php
+// config/qwantum.image.php
+'folder_to_model' => [
+    'users' => \App\User::class,
+],
+```
+
+2. 設定參數在 Model 中。
+
+```php
+class User extends Model
+{
+    use Imageable;
+
+    public static $is_need_generate_thumbnails = true;
+
+    public static $generate_thumbnail_settings = [
+        'small' => [100, 100],
+        'large' => [500, 500],
+    ];
+
+    public static $is_need_resize_to_max_width = false;
+}
+```

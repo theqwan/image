@@ -117,7 +117,11 @@ class Image extends Model
     /** @inheritDoc */
     public function __get($key)
     {
-        foreach (array_keys(config('qwantum.image.thumbnails')) as $thumbnail_name) {
+        $imageable = $this->getOriginal('imageable_type');
+
+        $thumbnail_settings = $imageable ? ($imageable::isNeedGenerateThumbnails() ? $imageable::getGenerateThumbnailSettings() : []) : config('qwantum.image.thumbnails');
+
+        foreach (array_keys($thumbnail_settings) as $thumbnail_name) {
             if ($key === $thumbnail_name) {
                 return $this->getThumbnailPathWithFilename($key);
             } elseif ($key === $thumbnail_name . '_url') {

@@ -159,4 +159,25 @@ class UploadTest extends TestCase
         list($width, $height, $type, $attr) = getimagesize(Storage::path($image->super_big));
         $this->assertEquals([600, 500], [$width, $height]);
     }
+
+    /** @test */
+    public function no_thumbnails_test()
+    {
+        $response = $this->json('POST', route('images.upload', 'pages'), [
+            'upload' => $fake_image = UploadedFile::fake()->image('avatar.jpg', 1200, 1000),
+            'role' => 'cover',
+        ])->assertStatus(200);
+
+        $image = Image::first();
+
+        $page = Page::create(['title' => 'page1']);
+
+        $page->images()->save($image);
+
+        $image = $page->images()->where('role', 'cover')->first();
+
+        $this->assertNull($image->small);
+        $this->assertNull($image->medium);
+        $this->assertNull($image->large);
+    }
 }

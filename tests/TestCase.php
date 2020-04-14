@@ -56,5 +56,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
         ]);
 
         $app['config']->set('qwantum.image.imagemagick_path', '/usr/local/opt/imagemagick@6/bin/');
+        $app['config']->set('qwantum.image.folder_to_model', [
+            'pages' => Page::class,
+        ]);
     }
 }

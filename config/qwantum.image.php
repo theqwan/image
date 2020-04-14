@@ -50,4 +50,15 @@ return [
         'large' => [300, 300],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Conversion table
+    |--------------------------------------------------------------------------
+    | You need set this if your imageable model has special thumbnail size, or doesn't need generate thumbnail, or resize max width.
+    | setting example: `'folder' => 'ModelNamespace'`.
+    */
+    'folder_to_model' => [
+        // 'articles' => \App\Models\Article::class,
+    ],
+
 ];
