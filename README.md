@@ -105,7 +105,7 @@ class User extends Model
 
     public static $generate_thumbnail_settings = [
         'small' => [100, 100],
-        'large' => [500, 500],
+        'large' => [500, 500, 'top'],
     ];
 
     public static $is_need_resize_to_max_width = false;

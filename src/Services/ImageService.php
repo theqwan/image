@@ -134,16 +134,49 @@ class ImageService
         $thumbnail_settings = $this->imageable ? $this->imageable::getGenerateThumbnailSettings() : config('qwantum.image.thumbnails');
 
         foreach ($thumbnail_settings as $thumbnail_name => $resize_setting) {
-            list($width, $height) = $resize_setting;
+            list($width, $height, $position) = $this->parseResizeSetting($resize_setting);
+
+            $upsize = function ($constraint) {
+                $constraint->upsize();
+            };
 
             $thumbnail_image = \Intervention\Image\Facades\Image::make(Storage::path($this->moveTo($folder, "{$filename}.{$extension}")))
-                ->resize($width, $height, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })
+                ->fit($width, $height, $upsize, $position)
                 ->stream();
 
             Storage::put($this->moveTo($folder, "{$filename}_{$thumbnail_name}.{$extension}"), $thumbnail_image);
+        }
+    }
+
+    /**
+     * @param array $setting
+     * @return array
+     */
+    protected function parseResizeSetting($setting)
+    {
+        if (count($setting) === 3) {
+            switch ($setting[2]) {
+                case 'top-left':
+                case 'top':
+                case 'top-right':
+                case 'left':
+                case 'center':
+                case 'right':
+                case 'bottom-left':
+                case 'bottom':
+                case 'bottom-right':
+                    $position = $setting[2];
+                    break;
+                default:
+                    $position = 'center';
+                    break;
+            }
+
+            return [$setting[0], $setting[1], $position];
+        } elseif (count($setting) === 2) {
+            return [$setting[0], $setting[1], 'center'];
+        } else {
+            return [$setting[0], null, 'center'];
         }
     }
 

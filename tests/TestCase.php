@@ -3,7 +3,7 @@
 namespace Qwantum\Image\Tests;
 
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\ImageServiceProviderLaravel5;
+use Intervention\Image\ImageServiceProviderLaravelRecent;
 use Qwantum\Image\ImageServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
@@ -35,7 +35,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [
             ImageServiceProvider::class,
-            ImageServiceProviderLaravel5::class,
+            ImageServiceProviderLaravelRecent::class,
             TestServiceProvider::class,
         ];
     }
