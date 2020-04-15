@@ -129,12 +129,11 @@ class UploadTest extends TestCase
     {
         Config::set('qwantum.image.thumbnails', [
             'small' => [50, 50],
-            'medium' => [null, 100],
-            'large' => [300, null],
-            'super_big' => [1280, null],
+            'large' => [300, 250],
+            'super_big' => [800, null],
         ]);
 
-        Config::set('qwantum.image.max_width', 600);
+        Config::set('qwantum.image.max_width', 1000);
 
         $response = $this->json('POST', route('images.upload', 'test'), [
             'upload' => $fake_image = UploadedFile::fake()->image('avatar.jpg', 1200, 1000),
@@ -145,11 +144,7 @@ class UploadTest extends TestCase
 
         Storage::assertExists($image->small);
         list($width, $height, $type, $attr) = getimagesize(Storage::path($image->small));
-        $this->assertEquals([50, 42], [$width, $height]);
-
-        Storage::assertExists($image->medium);
-        list($width, $height, $type, $attr) = getimagesize(Storage::path($image->medium));
-        $this->assertEquals([120, 100], [$width, $height]);
+        $this->assertEquals([50, 50], [$width, $height]);
 
         Storage::assertExists($image->large);
         list($width, $height, $type, $attr) = getimagesize(Storage::path($image->large));
@@ -157,6 +152,27 @@ class UploadTest extends TestCase
 
         Storage::assertExists($image->super_big);
         list($width, $height, $type, $attr) = getimagesize(Storage::path($image->super_big));
-        $this->assertEquals([600, 500], [$width, $height]);
+        $this->assertEquals([800, 800], [$width, $height]);
+    }
+
+    /** @test */
+    public function no_thumbnails_test()
+    {
+        $response = $this->json('POST', route('images.upload', 'pages'), [
+            'upload' => $fake_image = UploadedFile::fake()->image('avatar.jpg', 1200, 1000),
+            'role' => 'cover',
+        ])->assertStatus(200);
+
+        $image = Image::first();
+
+        $page = Page::create(['title' => 'page1']);
+
+        $page->images()->save($image);
+
+        $image = $page->images()->where('role', 'cover')->first();
+
+        $this->assertNull($image->small);
+        $this->assertNull($image->medium);
+        $this->assertNull($image->large);
     }
 }

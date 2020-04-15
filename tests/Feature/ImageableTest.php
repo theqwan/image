@@ -30,4 +30,25 @@ class ImageableTest extends TestCase
 
         $this->assertTrue(count(Article::first()->images) == 1);
     }
+
+    /** @test */
+    public function test_isNeedGenerateThumbnails()
+    {
+        $this->assertEquals(true, Article::isNeedGenerateThumbnails());
+        $this->assertEquals(false, Page::isNeedGenerateThumbnails());
+    }
+
+    /** @test */
+    public function test_getGenerateThumbnailSettings()
+    {
+        $this->assertEquals(config('qwantum.image.thumbnails'), Article::getGenerateThumbnailSettings());
+        $this->assertEquals(['big' => [1000, 1000]], Page::getGenerateThumbnailSettings());
+    }
+
+    /** @test */
+    public function test_isNeedResizeToMaxWidth()
+    {
+        $this->assertEquals(true, Article::isNeedResizeToMaxWidth());
+        $this->assertEquals(false, Page::isNeedResizeToMaxWidth());
+    }
 }
