@@ -11,7 +11,7 @@ return [
     /*
     | Image storage domain.
     */
-    'storage_domain' => 'localhost',
+    'storage_domain' => env('DOMAIN_FILESTORAGE', 'localhost'),
 
     /*
     | ImageMagick command PATH.
@@ -42,12 +42,32 @@ return [
     | Thumbnail Setting
     |--------------------------------------------------------------------------
     | Resize the image, this setting is optional so can leave empty.
-    | setting example: `'thumbnail_name' => [{width}, {height}],`, width and height can set null.
+    | setting example: `'thumbnail_name' => [{width}, {height}, {position}],`, The 'height' and 'position' is optional.
+    | The 'position' values are:
+    |   - top-left
+    |   - top
+    |   - top-right
+    |   - left
+    |   - center (default)
+    |   - right
+    |   - bottom-left
+    |   - bottom
+    |   - bottom-right
     */
     'thumbnails' => [
-        'small' => [50, 50],
-        'medium' => [150, 150],
-        'large' => [300, 300],
+        'small' => [50, 50, 'center'],
+        'large' => [300, 300, 'center'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Conversion table
+    |--------------------------------------------------------------------------
+    | You need set this if your imageable model has special thumbnail size, or doesn't need generate thumbnail, or resize max width.
+    | setting example: `'folder' => 'ModelNamespace'`.
+    */
+    'folder_to_model' => [
+        // 'articles' => \App\Models\Article::class,
     ],
 
 ];

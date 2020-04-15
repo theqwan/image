@@ -11,6 +11,24 @@ use Qwantum\Image\Image;
 class ImageService
 {
     /**
+     * Namespace of model.
+     *
+     * @var string|null
+     */
+    protected $imageable = null;
+
+    /**
+     * @param string $folder
+     * @return void
+     */
+    protected function init($folder)
+    {
+        if (array_key_exists($folder, config('qwantum.image.folder_to_model'))) {
+            $this->imageable = config("qwantum.image.folder_to_model.{$folder}");
+        }
+    }
+
+    /**
      * @param UploadedFile $uploadedFile
      * @param string $folder
      * @param string|null $role
@@ -20,6 +38,8 @@ class ImageService
      */
     public function saveImage(UploadedFile $uploadedFile, $folder, $role = null, $location = null, $manual_order = null)
     {
+        $this->init($folder);
+
         $filename = pathinfo($uploadedFile->hashName(), PATHINFO_FILENAME);
         $original_filename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
         $mime_type = $uploadedFile->getMimeType();
@@ -72,6 +92,10 @@ class ImageService
      */
     protected function resizeToMaxWidth($uploadedFile_path)
     {
+        if ($this->imageable && !$this->imageable::isNeedResizeToMaxWidth()) {
+            return;
+        }
+
         $resize_command = config('qwantum.image.imagemagick_path') . str_replace([':path', ':max_width'], [$uploadedFile_path, config('qwantum.image.max_width')], config('qwantum.image.resize_max_width_command'));
         exec($resize_command, $exce_output, $exec_result);
 
@@ -103,17 +127,56 @@ class ImageService
      */
     protected function generateThumbnails($folder, $filename, string $extension)
     {
-        foreach (config('qwantum.image.thumbnails') as $thumbnail_name => $resize_setting) {
-            list($width, $height) = $resize_setting;
+        if ($this->imageable && !$this->imageable::isNeedGenerateThumbnails()) {
+            return;
+        }
+
+        $thumbnail_settings = $this->imageable ? $this->imageable::getGenerateThumbnailSettings() : config('qwantum.image.thumbnails');
+
+        foreach ($thumbnail_settings as $thumbnail_name => $resize_setting) {
+            list($width, $height, $position) = $this->parseResizeSetting($resize_setting);
+
+            $upsize = function ($constraint) {
+                $constraint->upsize();
+            };
 
             $thumbnail_image = \Intervention\Image\Facades\Image::make(Storage::path($this->moveTo($folder, "{$filename}.{$extension}")))
-                ->resize($width, $height, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })
+                ->fit($width, $height, $upsize, $position)
                 ->stream();
 
             Storage::put($this->moveTo($folder, "{$filename}_{$thumbnail_name}.{$extension}"), $thumbnail_image);
+        }
+    }
+
+    /**
+     * @param array $setting
+     * @return array
+     */
+    protected function parseResizeSetting($setting)
+    {
+        if (count($setting) === 3) {
+            switch ($setting[2]) {
+                case 'top-left':
+                case 'top':
+                case 'top-right':
+                case 'left':
+                case 'center':
+                case 'right':
+                case 'bottom-left':
+                case 'bottom':
+                case 'bottom-right':
+                    $position = $setting[2];
+                    break;
+                default:
+                    $position = 'center';
+                    break;
+            }
+
+            return [$setting[0], $setting[1], $position];
+        } elseif (count($setting) === 2) {
+            return [$setting[0], $setting[1], 'center'];
+        } else {
+            return [$setting[0], null, 'center'];
         }
     }
 
