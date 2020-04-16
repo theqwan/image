@@ -76,7 +76,7 @@ class Image extends Model
     public function getThumbnailUrl($thumbnail_name)
     {
         if (array_key_exists($thumbnail_name, config('qwantum.image.thumbnails'))) {
-            return ImageStorageUrl::to('uploads/' . $this->getThumbnailPathWithFilename($thumbnail_name));
+            return ImageStorageUrl::to($this->getThumbnailPathWithFilename($thumbnail_name));
         } else {
             return null;
         }
