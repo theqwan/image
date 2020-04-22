@@ -3,6 +3,7 @@
 namespace Qwantum\Image;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Qwantum\Image\Facades\ImageStorageUrl;
 
 class Image extends Model
@@ -118,6 +119,10 @@ class Image extends Model
     public function __get($key)
     {
         $imageable = $this->getOriginal('imageable_type');
+
+        if ($custom_morphed_model = Relation::getMorphedModel($imageable)) {
+            $imageable = $custom_morphed_model;
+        }
 
         $thumbnail_settings = $imageable ? ($imageable::isNeedGenerateThumbnails() ? $imageable::getGenerateThumbnailSettings() : []) : config('qwantum.image.thumbnails');
 
