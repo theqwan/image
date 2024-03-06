@@ -7,6 +7,14 @@ trait Imageable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
+    public function image()
+    {
+        return $this->morphOne(Image::class, 'imageable')->latest();
+    }
+    
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
     public function images()
     {
         return $this->morphMany(Image::class, 'imageable');
