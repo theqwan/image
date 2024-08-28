@@ -4,6 +4,7 @@ namespace Qwantum\Image\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Qwantum\Image\Exceptions\CompressException;
 use Qwantum\Image\Exceptions\ResizeException;
 use Qwantum\Image\Image;
@@ -71,6 +72,23 @@ class ImageService
         $image = Image::query()->create(compact('role', 'filename', 'original_filename', 'mime_type', 'extension', 'path', 'size', 'location', 'manual_order'));
 
         return $image;
+    }
+
+    /**
+     * @param Image $image
+     * @return bool
+     */
+    public function deleteImage(Image $image)
+    {
+        $pattern = "{$image->path}{$image->filename}*";
+
+        $files = glob(Storage::path($pattern));
+
+        foreach ($files as $file) {
+            Storage::delete(Str::remove(Storage::path('/'), $file));
+        }
+
+        return $image->delete();
     }
 
     /**
