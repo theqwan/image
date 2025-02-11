@@ -28,7 +28,7 @@ return [
     |
     | Default setting: "convert :path -resize 1920 -sharpen 0.25x0.25 -quality 100 :path"
     */
-    'resize_max_width_command' => 'convert :path -auto-level -resize :max_width -sharpen 0.25x0.25 -quality 100 :path',
+    'resize_max_width_command' => 'convert :path -auto-level -auto-orient -resize :max_width -sharpen 0.25x0.25 -quality 100 :path',
 
     /*
     | ImageMagick compress command, use `str_replace(':path', $full_path, $command)` to replace ':path'.
