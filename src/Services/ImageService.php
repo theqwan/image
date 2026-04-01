@@ -159,6 +159,7 @@ class ImageService
             };
 
             $thumbnail_image = \Intervention\Image\Facades\Image::make(Storage::path($this->moveTo($folder, "{$filename}.{$extension}")))
+                ->orientate()
                 ->fit($width, $height, $upsize, $position)
                 ->stream();
 

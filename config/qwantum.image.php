@@ -35,7 +35,7 @@ return [
     |
     | Default setting: "mogrify -quality 85 -filter Triangle -define filter:support=2 -unsharp 0.25x0.25+8+0.065 -dither None -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB :path"
     */
-    'compress_command' => 'mogrify -quality 85 -filter Triangle -define filter:support=2 -unsharp 0.25x0.25+8+0.065 -dither None -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB :path',
+    'compress_command' => 'mogrify -auto-orient -quality 85 -filter Triangle -define filter:support=2 -unsharp 0.25x0.25+8+0.065 -dither None -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB :path',
 
     /*
     |--------------------------------------------------------------------------
