@@ -5,6 +5,7 @@ namespace Qwantum\Image\Services;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
 use Qwantum\Image\Exceptions\CompressException;
 use Qwantum\Image\Exceptions\ResizeException;
 use Qwantum\Image\Image;
@@ -154,14 +155,11 @@ class ImageService
         foreach ($thumbnail_settings as $thumbnail_name => $resize_setting) {
             list($width, $height, $position) = $this->parseResizeSetting($resize_setting);
 
-            $upsize = function ($constraint) {
-                $constraint->upsize();
-            };
-
-            $thumbnail_image = \Intervention\Image\Facades\Image::make(Storage::path($this->moveTo($folder, "{$filename}.{$extension}")))
-                ->orientate()
-                ->fit($width, $height, $upsize, $position)
-                ->stream();
+            $thumbnail_image = ImageManager::gd()
+                ->read(Storage::path($this->moveTo($folder, "{$filename}.{$extension}")))
+                ->coverDown($width, $height ?? $width, $position)
+                ->encode()
+                ->toString();
 
             Storage::put($this->moveTo($folder, "{$filename}_{$thumbnail_name}.{$extension}"), $thumbnail_image);
         }

@@ -2,6 +2,16 @@
 
 該套件提供圖片上傳與製作縮圖的功能。使用 ImageMagick 和 intervention/image 來製作縮圖。
 
+## 相容版本
+
+| PHP | Laravel |
+|---|---|
+| ^8.2 | ^11.0 |
+| ^8.2 | ^12.0 |
+| ^8.3 | ^13.0 |
+
+> Laravel 13 要求 PHP ^8.3，所以搭配 Laravel 13 時實際最低 PHP 版本為 8.3；搭配 Laravel 11 / 12 時最低 PHP 版本為 8.2。
+
 ## Composer
 ```
 composer install qwantum/image
